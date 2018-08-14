@@ -1,0 +1,8 @@
+# For optimised residual gradient which is to be shimmed for metabolomic data acquisition (used for AU program: au_metabo)
+# Shim_name Maximum_Step_Size   Number_of_Iterations
+
+CRITERIUM LOCK
+DELAY 2
+Z   10  5
+Z2  10  5
+Z   10  5

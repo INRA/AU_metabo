@@ -1,0 +1,29 @@
+/**********************************************************/
+/*    au_metabo          01.08.2018                       */
+/**********************************************************/
+/*    Short Description :                                 */
+/*  General AU program for metabolomic data acquisition   */
+/**********************************************************/
+/*    Author(s) :                                         */
+/*    Name         : Jean-Xavier FONTAINE                 */
+/*    Organisation : Universite de Picardie, France       */
+/*    Email        : jean-xavier.fontaine@u-picardie.fr   */
+/**********************************************************/
+
+GETCURDATA;
+CPR_exec("atma exact",WAIT_TERM); //Automatic probe tuning
+i1 = ssleep (10);
+CPR_exec("lock MeOD",WAIT_TERM); // Lock on MeOD solvent
+AUTOGAIN;
+AUTOPHASE;
+RSH("bestMeOD"); // Call the shim file (here: bestMeOD) optimize for the sample
+CPR_exec("topshim rga durmax=30 z6 ls lshump tunebxyz",WAIT_TERM); // Topshim with a tune before (tunebxyz) then optimization of lineshape with narrow width (ls) and lineshape with narrow hump (lshump)
+CPR_exec("lock MeOD",WAIT_TERM); // Lock on MeOD solvent (because sometimes the lock is lost after the TopShim)
+AUTOGAIN;
+AUTOPHASE;
+TUNE("tunemetabo"); //Tune after gradient shimming is used to ensure the absolute best shims if some residual shim gradients remain
+AUTOSHIM_ON; // starting the autoshim
+CPR_exec("xau pulsecal quiet",WAIT_TERM); // p1 optimization
+i1 = ssleep (120); // waiting time to stabilize the system before the acquisition
+ZG; 
+QUIT

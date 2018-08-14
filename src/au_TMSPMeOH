@@ -1,0 +1,181 @@
+/**********************************************************/
+/*    au_TMSPMeOH        01.08.2018                       */
+/**********************************************************/
+/*    Short Description :                                 */
+/*  AU program for full width at half maximum (FWHM)      */ 
+/*  and signal-to-noise ratio (S/N) calculations of       */
+/*  TMSP singlet (at 0 ppm) and                           */
+/*  MeOH multiplet (at 3.32 ppm)for methanolic extracts   */
+/**********************************************************/
+/*    Author(s) :                                         */
+/*    Name         : Jean-Xavier FONTAINE                 */
+/*    Organisation : Universite de Picardie, France       */
+/*    Email        : jean-xavier.fontaine@u-picardie.fr   */
+/**********************************************************/
+
+#include <inc/linutil> 
+char **filelist,pulprog[PATH_MAX], linebuf[PATH_MAX], pp_reportcsv[PATH_MAX], chaine[PATH_MAX], infile[PATH_MAX], *inbuf1;
+FILE *f_pp, *reportcsv, *fpout;
+int *inbufint1, parmode, nbexpe, numstart, numend, numPeaks, i, j, k, si, bytordp, bytetoread, fdin, valmin, valsup, posx;
+float sinoval1, sinoval2, offset, hzppt; 
+double sf, ppmppt, hwcal1, hwcal2;
+
+int *intens=NULL, *index=NULL;
+double *ppm=NULL;
+
+
+GETCURDATA
+sprintf(text,"%s/%s",disk,name);
+nbexpe=getdir(text,&filelist,NULL);
+Proc_err(DEF_ERR_OPT, "Nombre d'experiences : %d",nbexpe);
+
+numstart=atoi(filelist[0]);
+GETINT("First experiment:", numstart);
+
+numend=atoi(filelist[nbexpe-1]);
+GETINT("Last experience :", numend);
+
+if (numstart>numend)
+{
+Proc_err(DEF_ERR_OPT, "Problem ... the start number (%d) is greater than the end number (%d)!", numstart, numend);
+ABORT;
+}
+
+/* initializing the Excel Report file */
+sprintf (pp_reportcsv,"%s/Report_autoFWHMSINO_TMSPMeOH_%s.csv",disk,name);
+if ( (reportcsv = fopen (pp_reportcsv,"wt")) == NULL )
+{
+  Perror(DEF_ERR_OPT,pp_reportcsv);
+  ABORT
+}
+fprintf (reportcsv,"number of experiment;name;width TMSP;width MeOH;sino1;sino2 \n");
+
+for (j=0; j<nbexpe; j++)
+{
+ sprintf(text,"%s/%s",disk,filelist[j]);
+ i2=atoi(filelist[j]);
+
+ if (i2>=numstart && i2<=numend)
+ {
+  DATASET(name,i2,1,disk,user);
+  FETCHPARS ("PULPROG",pulprog);
+  FETCHPARS ("PARMODE",&parmode);
+  if (parmode == 0 && (strstr(pulprog,"noesypr1d")|| strstr(pulprog,"zg")))
+  {
+   GETCURDATA
+   f_pp= fopen(PROCPATH("title"),"rt");
+   fgets(linebuf,PATH_MAX-1 , f_pp);
+   i = strlen(linebuf);
+   memset (chaine, '\0', sizeof (chaine));
+   for (k=0; k<i; k++)
+   {
+    if (linebuf[k]!='\n') {chaine[k] = linebuf[k];} else {chaine[k] = '\0';}
+   }
+   fclose (f_pp);
+   f_pp= fopen(PROCPATH("1r"), "rt");
+   if (f_pp == NULL){fprintf (reportcsv,"%d;%s;Acquisition problem\n",i2,chaine);}
+   else 
+   {  
+    fclose(f_pp); 
+    STOREPAR("ABSF1",0.3);
+    STOREPAR("ABSF2",-0.3);
+                
+    FETCHPARS("BYTORDP",&bytordp);
+    FETCHPARS("SI",&si);
+    FETCHPARS("OFFSET",&offset);
+    FETCHPARS("SF",&sf);
+    FETCHPARS("HZpPT",&hzppt);
+    
+    ppmppt=(double)hzppt/sf;
+    bytetoread = si*sizeof(int);
+                
+    strcpy(infile,PROCPATH("1r"));
+    if ( (fdin=open(infile,O_RDONLY)) == (-1) ){Perror(DEF_ERR_OPT,"Impossible de lire le fichier 1r");ABORT}
+    if ( (inbuf1 = calloc (bytetoread,sizeof(char*))) == NULL){Perror(DEF_ERR_OPT,infile);close (fdin);fclose (fpout);ABORT}
+    if ( (i = read (fdin,inbuf1,bytetoread)) != bytetoread ){Perror(DEF_ERR_OPT,infile);fclose (fpout);close (fdin);ABORT}
+    close(fdin);
+    local_swap4(inbuf1,bytetoread,bytordp);
+    inbufint1 = (int *)inbuf1;
+
+    intens = malloc(si*sizeof(int));
+    index = malloc(si*sizeof(int));
+    ppm = malloc(si*sizeof(double));
+
+    for (i=0; i < si; i++)
+    {
+     index[i]=i+1;
+     intens[i]=inbufint1[i];
+     ppm[i]=offset-ppmppt*(i+0.5);
+    }
+                
+    STOREPAR("F1P",0.05);
+    STOREPAR("F2P",-0.05);
+    STOREPAR("MI",10.0);
+    STOREPAR("MAXI",10000.0);
+    STOREPAR("PSCAL",1);
+    STOREPAR("PC",4.0);
+    STOREPAR("CY",100.0);
+    PP
+    numPeaks = readPeakList(PROCPATH(0));
+    if (numPeaks < 1){Proc_err (DEF_ERR_OPT,"No peak found!");ABORT;}
+    posx = getPeakAddress(0);
+    freePeakList(); 
+                
+    k=posx; 
+    while (intens[k]>intens[posx]/2 && k<si-1) {k=k+1;}
+    valmin=index[k];
+
+    k=posx; 
+    while (intens[k]>intens[posx]/2 && k>0) {k=k-1;}
+    valsup=index[k];
+                
+    hwcal1=(((((ppm[valsup+1]-ppm[valsup])/(intens[valsup+1]-intens[valsup]))*(intens[posx]/2-intens[valsup]))+ppm[valsup])-((((ppm[valmin]-ppm[valmin-1])/(intens[valmin]-intens[valmin-1]))*(intens[posx]/2-intens[valmin-1]))+ppm[valmin-1]))*sf;
+                
+    STOREPAR("F1P",3.3235);
+    STOREPAR("F2P",3.3187);
+    PP
+    numPeaks = readPeakList(PROCPATH(0));
+    if (numPeaks < 1){Proc_err (DEF_ERR_OPT,"No peak found!");ABORT;}
+    posx = getPeakAddress(0);
+    freePeakList(); 
+                
+    k=posx; 
+    while (intens[k]>intens[posx]/2 && k<si-1) {k=k+1;}
+    valmin=index[k];
+
+    k=posx; 
+    while (intens[k]>intens[posx]/2 && k>0) {k=k-1;}
+    valsup=index[k];
+                
+    hwcal2=(((((ppm[valsup+1]-ppm[valsup])/(intens[valsup+1]-intens[valsup]))*(intens[posx]/2-intens[valsup]))+ppm[valsup])-((((ppm[valmin]-ppm[valmin-1])/(intens[valmin]-intens[valmin-1]))*(intens[posx]/2-intens[valmin-1]))+ppm[valmin-1]))*sf;
+            
+            
+    STOREPAR("F1P",0.30);
+    STOREPAR("F2P",-0.30);
+    XCMD("setdef ackn no");
+    PP
+    numPeaks = readPeakList(PROCPATH(0));
+    if (numPeaks < 1) {fprintf (reportcsv,"%d;%s;Problem no TMSP peak\n",i2,chaine);}
+    else
+    {
+     STOREPAR("SIGF1",0.30);
+     STOREPAR("SIGF2",-0.30);
+     STOREPAR("NOISF1",-0.5);
+     STOREPAR("NOISF2",-1.0);
+     SINO; 
+     FETCHPARS("SINO",&sinoval1);
+                    
+     STOREPAR("SIGF1",3.34);
+     STOREPAR("SIGF2",3.30);
+     STOREPAR("NOISF1",-0.5);
+     STOREPAR("NOISF2",-1.0);
+     SINO; 
+     FETCHPARS("SINO",&sinoval2);
+     fprintf (reportcsv,"%d;%s;%.5f;%.5f;%.2f;%.2f\n",i2,chaine,hwcal1,hwcal2,sinoval1,sinoval2);
+    }
+   }
+  }   
+ }
+}
+fclose (reportcsv);
+QUIT
