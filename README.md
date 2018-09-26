@@ -5,9 +5,9 @@ The source code provided in this repository is available under the [CC BY-SA 4.0
 
 It is part of the submitted paper in the Metabolomics Journal, entitled : 
 
-"Optimizing 1D 1H-NMR profiling of plant samples from extract preparation to spectra processing : standardisation, automation and high-throughput"
+"Optimizing 1D 1H-NMR profiling of plant samples for high throughput analysis: extract preparation, standardization, automation and spectra processing"
 
-Authors: Catherine Deborde^1,2%^, Jean-Xavier Fontaine^3%^, Daniel Jacob^1,2^, Adolfo Botana^4^, Valérie Nicaise^5^, Florence Forget^5^, Sylvain Lecomte^3^, Cédric Decourtil^3^, Amar Hamadeh^3^, François Mesnard^3^, Annick Moing^1,2^, Roland Molinié^3^ 
+Authors: Catherine Deborde 1,2%, Jean-Xavier Fontaine 3%, Daniel Jacob 1,2, Adolfo Botana 4, Valérie Nicaise 5, Florence Forget 5, Sylvain Lecomte 3, Cédric Decourtil 3, Amar Hamadeh 3, François Mesnard 3, Annick Moing 1,2, Roland Molinié 3 
 
 * 1 UMR1332 Biologie du Fruit et Pathologie, INRA, Univ. Bordeaux, Centre INRA de Nouvelle Aquitaine Bordeaux, av Edouard Bourlaux, F-33140 Villenave d’Ornon, France
 * 2 Plateforme Métabolome du Centre de Génomique Fonctionnelle Bordeaux, MetaboHUB, IBVM, Centre INRA de Nouvelle Aquitaine Bordeaux, av Edouard Bourlaux, F-33140 Villenave d’Ornon, France
