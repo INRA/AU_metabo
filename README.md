@@ -7,14 +7,14 @@ It is part of the submitted paper in the Metabolomics Journal, entitled :
 
 "Optimizing 1D 1H-NMR profiling of plant samples for high throughput analysis: extract preparation, standardization, automation and spectra processing"
 
-Authors: Catherine Deborde **1,2%**, Jean-Xavier Fontaine 3%, Daniel Jacob 1,2, Adolfo Botana 4, Valérie Nicaise 5, Florence Forget 5, Sylvain Lecomte 3, Cédric Decourtil 3, Amar Hamadeh 3, François Mesnard 3, Annick Moing 1,2, Roland Molinié 3 
+Authors: Catherine Deborde **1,2%**, Jean-Xavier Fontaine **3%**, Daniel Jacob **1,2**, Adolfo Botana **4**, Valérie Nicaise **5**, Florence Forget **5**, Sylvain Lecomte **3**, Cédric Decourtil **3**, Amar Hamadeh **3**, François Mesnard **3**, Annick Moing **1,2**, Roland Molinié **3** 
 
 * **1** UMR1332 Biologie du Fruit et Pathologie, INRA, Univ. Bordeaux, Centre INRA de Nouvelle Aquitaine Bordeaux, av Edouard Bourlaux, F-33140 Villenave d’Ornon, France
 * **2** Plateforme Métabolome du Centre de Génomique Fonctionnelle Bordeaux, MetaboHUB, IBVM, Centre INRA de Nouvelle Aquitaine Bordeaux, av Edouard Bourlaux, F-33140 Villenave d’Ornon, France
-* 3  BIOPI - EA 3900, Univ. Picardie Jules Verne, 33 rue Saint Leu, F-80039 Amiens, France
-* 4  JEOL UK, Silver Court, Watchmead Road, Welwyn Garden City, AL7 1LT, UK
-* 5  UR MycSA,INRA, Centre INRA de Nouvelle Aquitaine Bordeaux, av Edouard Bourlaux,  F-33140 Villenave d’Ornon, France
-* % These two authors have contributed equally to this work 
+* **3**  BIOPI - EA 3900, Univ. Picardie Jules Verne, 33 rue Saint Leu, F-80039 Amiens, France
+* **4**  JEOL UK, Silver Court, Watchmead Road, Welwyn Garden City, AL7 1LT, UK
+* **5**  UR MycSA,INRA, Centre INRA de Nouvelle Aquitaine Bordeaux, av Edouard Bourlaux,  F-33140 Villenave d’Ornon, France
+* **%** These two authors have contributed equally to this work 
 
 # au_metabo
 ## AU program for metabolomic data acquisition
